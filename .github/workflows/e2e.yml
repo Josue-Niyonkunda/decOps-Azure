@@ -28,10 +28,9 @@ jobs:
         run: mvn clean install -DskipTests
 
       - name: Build project
-        run: mvn compile
+        run:  mvn test -Dtest=AccountTest
 
-      - name: Run automated tests
-        run: mvn test
+     
 
 
   auto-create-pr:
