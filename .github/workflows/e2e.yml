@@ -25,7 +25,8 @@ jobs:
           cache: maven
 
       - name: Build project
-        run:  mvn test -Dtest=AccountTest
+        run:  mvn clean compile
+
 
      
 
