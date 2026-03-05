@@ -1,45 +1,56 @@
-# File: azure-pipelines.yml
 trigger:
   branches:
     include:
-      - '*'   # Run on all branches
+      - main
+      # - ft/pipeline
 
 pr:
   branches:
     include:
-      - '*'   # Run on all pull requests
+      - main
+      # - ft/pipeline
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'windows-latest'
 
 variables:
-  MAVEN_OPTS: '-Xmx1024m'
+  MAVEN_CACHE_FOLDER: $(USERPROFILE)\.m2\repository
 
 steps:
-  # Checkout repository
-  - task: Checkout@1
-    displayName: 'Checkout repository'
+  - checkout: self
+    clean: true
 
-  # Set up JDK 17
   - task: JavaToolInstaller@0
     inputs:
       versionSpec: '17'
       jdkArchitectureOption: 'x64'
       jdkSourceOption: 'PreInstalled'
-    displayName: 'Set up JDK 17'
 
-  # Build Maven project
-  - script: mvn clean compile
-    displayName: 'Build project'
-
-  # Run tests
-  - script: mvn test
-    displayName: 'Run tests'
-
-  # Publish test results
-  - task: PublishTestResults@2
+  - task: Cache@2
     inputs:
-      testResultsFormat: 'JUnit'
-      testResultsFiles: '**/target/surefire-reports/*.xml'
-      failTaskOnFailedTests: true
-    displayName: 'Publish Test Results'
+      key: 'maven | "$(Agent.OS)" | **/pom.xml'
+      restoreKeys: |
+        maven | "$(Agent.OS)"
+      path: $(MAVEN_CACHE_FOLDER)
+    displayName: Cache Maven Dependencies
+
+  - script: mvn -B clean package
+    displayName: Build Maven Project
+
+  # 🔥 Archive target folder
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: 'target'
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
+      replaceExistingArchive: true
+    displayName: Archive Build Output
+
+  # 🚀 Publish Artifact
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop'
+      publishLocation: 'Container'
+    displayName: Publish Artifact
