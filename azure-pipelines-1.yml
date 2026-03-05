@@ -1,6 +1,4 @@
 # File: azure-pipelines.yml
-name: e2e
-
 trigger:
   branches:
     include:
@@ -9,7 +7,7 @@ trigger:
 pr:
   branches:
     include:
-      - '*'   # Run on all PRs
+      - '*'   # Run on all pull requests
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -18,11 +16,11 @@ variables:
   MAVEN_OPTS: '-Xmx1024m'
 
 steps:
-  #  Checkout the repository
-  - checkout: self
+  # Checkout repository
+  - task: Checkout@1
     displayName: 'Checkout repository'
 
-  #  Set up JDK 17
+  # Set up JDK 17
   - task: JavaToolInstaller@0
     inputs:
       versionSpec: '17'
@@ -30,11 +28,7 @@ steps:
       jdkSourceOption: 'PreInstalled'
     displayName: 'Set up JDK 17'
 
-  #  Install Playwright browsers
-  - script: mvn com.microsoft.playwright:playwright-maven-plugin:install-browsers
-    displayName: 'Install Playwright browsers'
-
-  #  Build the project
+  # Build Maven project
   - script: mvn clean compile
     displayName: 'Build project'
 
