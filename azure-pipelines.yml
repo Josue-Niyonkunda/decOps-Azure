@@ -1,5 +1,3 @@
-name: e2e
-
 trigger:
   branches:
     include:
