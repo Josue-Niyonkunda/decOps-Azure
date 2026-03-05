@@ -1,0 +1,51 @@
+# File: azure-pipelines.yml
+name: e2e
+
+trigger:
+  branches:
+    include:
+      - '*'   # Run on all branches
+
+pr:
+  branches:
+    include:
+      - '*'   # Run on all PRs
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  MAVEN_OPTS: '-Xmx1024m'
+
+steps:
+  #  Checkout the repository
+  - checkout: self
+    displayName: 'Checkout repository'
+
+  #  Set up JDK 17
+  - task: JavaToolInstaller@0
+    inputs:
+      versionSpec: '17'
+      jdkArchitectureOption: 'x64'
+      jdkSourceOption: 'PreInstalled'
+    displayName: 'Set up JDK 17'
+
+  #  Install Playwright browsers
+  - script: mvn com.microsoft.playwright:playwright-maven-plugin:install-browsers
+    displayName: 'Install Playwright browsers'
+
+  #  Build the project
+  - script: mvn clean compile
+    displayName: 'Build project'
+
+  # Run tests
+  - script: mvn test
+    displayName: 'Run tests'
+
+  # Publish test results
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/target/surefire-reports/*.xml'
+      failTaskOnFailedTests: true
+    displayName: 'Publish Test Results'
