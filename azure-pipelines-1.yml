@@ -34,7 +34,7 @@ steps:
       path: $(MAVEN_CACHE_FOLDER)
     displayName: Cache Maven Dependencies
 
-  - script: mvn -B clean package
+  - script: mvn clean test
     displayName: Build Maven Project
 
   # 🔥 Archive target folder
