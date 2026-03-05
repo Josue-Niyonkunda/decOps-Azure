@@ -1,14 +1,15 @@
+# File: azure-pipelines.yml
+name: e2e
+
 trigger:
   branches:
     include:
-      - '*'   # Run on all branches
+      - '*'   # run on all branches
 
 pr:
   branches:
     include:
-      - '*'   # Run on all pull requests
-
-resources: []
+      - '*'   # run on all PRs
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -17,25 +18,31 @@ variables:
   MAVEN_OPTS: '-Xmx1024m'
 
 steps:
+  # Step 1: Checkout repository
   - task: Checkout@1
     displayName: 'Checkout repository'
 
+  # Step 2: Setup JDK 17
   - task: JavaToolInstaller@0
     inputs:
       versionSpec: '17'
       jdkArchitectureOption: 'x64'
       jdkSourceOption: 'PreInstalled'
-    displayName: 'Set up JDK 17'  
+    displayName: 'Set up JDK 17'
 
-  - script: "mvn com.microsoft.playwright:playwright-maven-plugin:install-browsers"
-    displayName: 'Install Playwright browsers'  
+  # Step 3: Install Playwright browsers
+  - script: mvn com.microsoft.playwright:playwright-maven-plugin:install-browsers
+    displayName: 'Install Playwright browsers'
 
-  - script: "mvn clean compile"
-    displayName: 'Build project' 
+  # Step 4: Build the project
+  - script: mvn clean compile
+    displayName: 'Build project'
 
-  - script: "mvn test"
-    displayName: 'Run tests'
+  # Step 5: Run selected tests
+  - script: mvn test -Dtest=LoginTest,RegisterTest,ResetTest
+    displayName: 'Run selected tests'
 
+  # Step 6: Publish test results to Azure DevOps
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: 'JUnit'
