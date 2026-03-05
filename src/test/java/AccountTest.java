@@ -16,7 +16,7 @@ public class AccountTest {
     static void launchBrowser() {
         playwright = Playwright.create();
         browser = playwright.chromium()
-                .launch(new BrowserType.LaunchOptions().setHeadless(false));
+                .launch(new BrowserType.LaunchOptions().setHeadless(true));
     }
 
     @BeforeEach
@@ -34,7 +34,6 @@ public class AccountTest {
         page.locator("[name='login']").click();
 
         String loginMessage = String.valueOf(page.getByRole(AriaRole.PARAGRAPH).nth(2));
-        System.out.println(loginMessage);
 
 //        assertTrue(loginMessage.contains("Hello josueniyonkunda"),
 //                "Login message did not match expected text");
@@ -70,6 +69,7 @@ public class AccountTest {
         String resetMessage = page.locator(".woocommerce-message").textContent();
 
         assertTrue(
+                //trying
 
                 resetMessage.contains("Password reset email has been sent."),
                 "Password reset message did not match"
