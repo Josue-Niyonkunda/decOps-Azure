@@ -37,7 +37,7 @@ steps:
   - script: mvn clean test
     displayName: Build Maven Project
 
-  # 🔥 Archive target folder
+  # Archive target folder
   - task: ArchiveFiles@2
     inputs:
       rootFolderOrFile: 'target'
@@ -47,7 +47,7 @@ steps:
       replaceExistingArchive: true
     displayName: Archive Build Output
 
-  # 🚀 Publish Artifact
+  # Publish Artifact
   - task: PublishBuildArtifacts@1
     inputs:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)'
